@@ -14,6 +14,7 @@ class CatGame {
     this.theme = THEMES.aquarium;
     this.speedMult = 1.0;
     this.targetCount = 5;
+    this.sizeScale = 1.0;
     this.bgTime = 0;
     this.bgBubbles = [];
     this.bgGrass = [];
@@ -35,13 +36,14 @@ class CatGame {
         this.theme = THEMES[this.themeName] || THEMES.aquarium;
         this.speedMult = SPEED_MULT[s.speed] || 1.0;
         this.targetCount = s.count || 5;
+        this.sizeScale = s.sizeScale || 1.0;
       }
     } catch (e) {}
   }
 
   _saveSettings() {
     const sn = Object.keys(SPEED_MULT).find(k => SPEED_MULT[k] === this.speedMult) || 'medium';
-    try { localStorage.setItem('catGameSettings', JSON.stringify({ theme: this.themeName, speed: sn, count: this.targetCount })); } catch (e) {}
+    try { localStorage.setItem('catGameSettings', JSON.stringify({ theme: this.themeName, speed: sn, count: this.targetCount, sizeScale: this.sizeScale })); } catch (e) {}
   }
 
   _resize() {
@@ -182,6 +184,17 @@ class CatGame {
       cv.textContent = this.targetCount;
       this._saveSettings(); this._reset();
     });
+
+    // Size slider
+    const sizeSlider = document.getElementById('sizeSlider');
+    const sv = document.getElementById('sizeValue');
+    sizeSlider.value = Math.round(this.sizeScale * 10);
+    sv.textContent = this.sizeScale.toFixed(1);
+    sizeSlider.addEventListener('input', () => {
+      this.sizeScale = parseInt(sizeSlider.value) / 10;
+      sv.textContent = this.sizeScale.toFixed(1);
+      this._saveSettings(); this._reset();
+    });
   }
 
   _reset() { this.entities = []; this.particles.clear(); this._initBg(); this._spawnAll(); }
@@ -195,7 +208,7 @@ class CatGame {
     const emoji = this.theme.emojis[Math.floor(Math.random() * this.theme.emojis.length)];
     // Scale size based on screen - bigger screen = bigger elements
     const screenScale = Math.max(1, Math.min(this.W, this.H) / 400);
-    const size = pattern === 'laser' ? 40 * screenScale : (38 + Math.random() * 18) * screenScale;
+    const size = (pattern === 'laser' ? 40 * screenScale : (38 + Math.random() * 18) * screenScale) * this.sizeScale;
     const a = Math.random() * Math.PI * 2;
     const spd = pattern === 'scurry' ? 2 + Math.random() * 2 : 1 + Math.random();
     this.entities.push({
