@@ -85,22 +85,15 @@ class CatGame {
 
   _capture(entity) {
     entity.captured = true;
+    entity.captureTime = Date.now();
     this.score++;
     document.getElementById('scoreDisplay').textContent = '✨ ' + this.score;
-    // BIG explosion - lots of particles
     const colors = this.theme.particleColors;
     this.particles.emit(entity.x, entity.y, colors, 40);
     this.particles.emitRing(entity.x, entity.y, colors, 20);
     this.particles.emit(entity.x, entity.y, ['#fff', '#fffde7', '#fff9c4'], 15);
-    // Screen flash
     this.flashAlpha = 0.4;
-    // Sound
     this.sound.playBig(this.theme.captureSound);
-    setTimeout(() => {
-      const idx = this.entities.indexOf(entity);
-      if (idx !== -1) this.entities.splice(idx, 1);
-      if (!this.paused) this._spawnOne();
-    }, 400);
   }
 
   _bindSettings() {
@@ -386,15 +379,6 @@ class CatGame {
     const breathe = 1 + Math.sin(e.time * 0.08) * 0.08;
     ctx.scale(breathe, breathe);
     // High contrast backing circle so emoji pops on any background
-    const r = e.size * 0.6;
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.fill();
-    // Colored ring
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = this.theme.particleColors[0] || '#fff';
-    ctx.stroke();
     if (this.theme.movePattern === 'laser') {
       ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 50;
       const pulse = 0.85 + Math.sin(e.time * 0.15) * 0.15;
@@ -416,7 +400,11 @@ class CatGame {
     const ctx = this.ctx;
     this._drawBg(ctx);
     for (const e of this.entities) { this._updateEntity(e); this._drawEntity(ctx, e); }
-    while (this.entities.filter(e => !e.captured).length < this.targetCount) this._spawnOne();
+    // Remove captured entities after 300ms, then refill to target count
+    const now = Date.now();
+    this.entities = this.entities.filter(e => !e.captured || (now - e.captureTime) < 300);
+    const alive = this.entities.filter(e => !e.captured).length;
+    for (let i = alive; i < this.targetCount; i++) this._spawnOne();
     this.particles.update();
     this.particles.draw(ctx);
     // Screen flash on capture
