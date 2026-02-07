@@ -201,7 +201,7 @@ class CatGame {
       y = pad + Math.random() * (this.H - pad * 2);
     }
     const emoji = this.theme.emojis[Math.floor(Math.random() * this.theme.emojis.length)];
-    const size = pattern === 'laser' ? 18 : 28 + Math.random() * 16;
+    const size = pattern === 'laser' ? 32 : 28 + Math.random() * 16;
     const a = Math.random() * Math.PI * 2;
     const spd = pattern === 'scurry' ? 2 + Math.random() * 2 : 1 + Math.random();
     this.entities.push({
@@ -355,9 +355,14 @@ class CatGame {
     ctx.translate(e.x, e.y);
     if (e.flipX) ctx.scale(-1, 1);
     if (this.theme.movePattern === 'laser') {
-      ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 25;
-      const pulse = 0.8 + Math.sin(e.time * 0.15) * 0.2;
+      ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 40;
+      const pulse = 0.85 + Math.sin(e.time * 0.15) * 0.15;
       ctx.scale(pulse, pulse);
+      // Extra glow layer
+      ctx.beginPath();
+      ctx.arc(0, 0, e.size * 0.6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,23,68,0.15)';
+      ctx.fill();
     }
     ctx.font = e.size + 'px serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
