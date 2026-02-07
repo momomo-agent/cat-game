@@ -107,7 +107,7 @@ class CatGame {
     const gear = document.getElementById('gearBtn');
     const overlay = document.getElementById('settingsOverlay');
     const ring = gear.querySelector('.progress-ring');
-    const circ = 2 * Math.PI * 18;
+    const circ = 2 * Math.PI * 22;
     let pressTimer = null, rafId = null, pressStart = 0;
     const startPress = (e) => {
       e.preventDefault(); e.stopPropagation();
@@ -115,7 +115,7 @@ class CatGame {
       pressStart = Date.now();
       gear.classList.add('pressing');
       const anim = () => {
-        const p = Math.min((Date.now() - pressStart) / 3000, 1);
+        const p = Math.min((Date.now() - pressStart) / 1500, 1);
         ring.style.strokeDashoffset = circ * (1 - p);
         if (p < 1) rafId = requestAnimationFrame(anim);
       };
@@ -125,7 +125,7 @@ class CatGame {
         overlay.classList.add('visible');
         gear.classList.remove('pressing');
         ring.style.strokeDashoffset = circ;
-      }, 3000);
+      }, 1500);
     };
     const endPress = (e) => {
       e.preventDefault(); e.stopPropagation();
@@ -200,7 +200,9 @@ class CatGame {
     const x = pad + Math.random() * (this.W - pad * 2);
     const y = pad + Math.random() * (this.H - pad * 2);
     const emoji = this.theme.emojis[Math.floor(Math.random() * this.theme.emojis.length)];
-    const size = pattern === 'laser' ? 40 : 38 + Math.random() * 18;
+    // Scale size based on screen - bigger screen = bigger elements
+    const screenScale = Math.max(1, Math.min(this.W, this.H) / 400);
+    const size = pattern === 'laser' ? 40 * screenScale : (38 + Math.random() * 18) * screenScale;
     const a = Math.random() * Math.PI * 2;
     const spd = pattern === 'scurry' ? 2 + Math.random() * 2 : 1 + Math.random();
     this.entities.push({
@@ -316,7 +318,7 @@ class CatGame {
     ctx.fillRect(0, 0, this.W, this.H);
 
     if (this.theme.bgType === 'bubbles') {
-      ctx.fillStyle = 'rgba(135,206,235,0.12)';
+      ctx.fillStyle = 'rgba(135,206,235,0.05)';
       for (const b of this.bgBubbles) {
         b.y -= b.speed; b.x += Math.sin(b.wobble + this.bgTime) * 0.3;
         if (b.y < -b.r * 2) b.y = this.H + b.r * 2;
@@ -324,7 +326,7 @@ class CatGame {
       }
     }
     if (this.theme.bgType === 'woodgrain') {
-      ctx.strokeStyle = 'rgba(62,39,35,0.12)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(62,39,35,0.06)'; ctx.lineWidth = 1;
       for (let y = 0; y < this.H; y += 30) {
         ctx.beginPath(); ctx.moveTo(0, y);
         for (let x = 0; x < this.W; x += 20) ctx.lineTo(x, y + Math.sin(x * 0.01 + y * 0.1) * 4);
@@ -332,7 +334,7 @@ class CatGame {
       }
     }
     if (this.theme.bgType === 'grass') {
-      ctx.strokeStyle = 'rgba(76,175,80,0.2)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(76,175,80,0.1)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
       for (const g of this.bgGrass) {
         const sway = Math.sin(this.bgTime * 1.5 + g.phase) * 8;
         ctx.beginPath(); ctx.moveTo(g.x, this.H);
@@ -341,7 +343,7 @@ class CatGame {
       }
     }
     if (this.theme.bgType === 'flowers') {
-      ctx.globalAlpha = 0.06; ctx.font = '24px serif';
+      ctx.globalAlpha = 0.03; ctx.font = '24px serif';
       ['🌸','🌺','🌼'].forEach((f, i) => { for (let j = i; j < 12; j += 3) ctx.fillText(f, (j * 137.5) % this.W, (j * 97.3) % this.H); });
       ctx.globalAlpha = 1;
     }
