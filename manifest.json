@@ -1,0 +1,17 @@
+{
+  "name": "Cat Game - 猫咪游戏",
+  "short_name": "CatGame",
+  "description": "A touch game for cats on iPad",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

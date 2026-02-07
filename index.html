@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>🐱 Cat Game</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<!-- Gear button with progress ring -->
+<div id="gearBtn">
+  <svg viewBox="0 0 44 44" width="44" height="44">
+    <circle class="progress-ring" cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-dasharray="113.1 113.1" stroke-dashoffset="113.1" stroke-linecap="round"/>
+  </svg>
+  <span class="gear-icon">⚙️</span>
+</div>
+
+<!-- Score -->
+<div id="scoreDisplay">✨ 0</div>
+
+<!-- Settings overlay -->
+<div id="settingsOverlay">
+  <div id="settingsPanel">
+    <h2>设置</h2>
+
+    <div class="setting-group">
+      <label>主题</label>
+      <div class="theme-buttons" id="themeButtons"></div>
+    </div>
+
+    <div class="setting-group">
+      <label>速度</label>
+      <div class="speed-buttons">
+        <button class="speed-btn" data-speed="slow">🐢 慢</button>
+        <button class="speed-btn active" data-speed="medium">🐈 中</button>
+        <button class="speed-btn" data-speed="fast">🐆 快</button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <label>数量: <span id="countValue">5</span></label>
+      <input type="range" id="countSlider" min="1" max="10" value="5">
+    </div>
+
+    <button id="closeBtn">关闭</button>
+  </div>
+</div>
+
+<script src="themes.js"></script>
+<script src="sound.js"></script>
+<script src="particles.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
