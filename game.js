@@ -332,6 +332,7 @@ class CatGame {
   }
 
   _drawBg(ctx) {
+    ctx.save();
     this.bgTime += 0.016;
     const grad = ctx.createLinearGradient(0, 0, 0, this.H);
     this.theme.bgGradient.forEach((c, i, a) => grad.addColorStop(i / (a.length - 1), c));
@@ -368,22 +369,17 @@ class CatGame {
       ['🌸','🌺','🌼'].forEach((f, i) => { for (let j = i; j < 12; j += 3) ctx.fillText(f, (j * 137.5) % this.W, (j * 97.3) % this.H); });
       ctx.globalAlpha = 1;
     }
+    ctx.restore();
   }
 
   _drawEntity(ctx, e) {
     if (e.captured) return;
     ctx.save();
+    ctx.globalAlpha = 1;
     ctx.translate(e.x, e.y);
     if (e.flipX) ctx.scale(-1, 1);
-    // Breathing animation to attract cat attention
     const breathe = 1 + Math.sin(e.time * 0.08) * 0.08;
     ctx.scale(breathe, breathe);
-    // Semi-transparent backing circle to make emoji visible
-    const r = e.size * 0.55;
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fill();
     if (this.theme.movePattern === 'laser') {
       ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 50;
       const pulse = 0.85 + Math.sin(e.time * 0.15) * 0.15;
@@ -393,6 +389,11 @@ class CatGame {
       ctx.fillStyle = 'rgba(255,23,68,0.2)';
       ctx.fill();
     }
+    // Drop shadow behind emoji for contrast on any background
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
     ctx.font = e.size + 'px serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(e.emoji, 0, 0);
