@@ -357,6 +357,16 @@ class CatGame {
     // Breathing animation to attract cat attention
     const breathe = 1 + Math.sin(e.time * 0.08) * 0.08;
     ctx.scale(breathe, breathe);
+    // High contrast backing circle so emoji pops on any background
+    const r = e.size * 0.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fill();
+    // Colored ring
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = this.theme.particleColors[0] || '#fff';
+    ctx.stroke();
     if (this.theme.movePattern === 'laser') {
       ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 50;
       const pulse = 0.85 + Math.sin(e.time * 0.15) * 0.15;
