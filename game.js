@@ -283,12 +283,12 @@ class CatGame {
     if (e.jumpTimer <= 0) {
       e.jumpTargetX = 60 + Math.random() * (this.W - 120);
       e.jumpTargetY = 60 + Math.random() * (this.H - 120);
-      e.jumpTimer = (40 + Math.random() * 30) / spd;
+      e.jumpTimer = (80 + Math.random() * 60) / spd;
     }
-    e.x += (e.jumpTargetX - e.x) * 0.12 * spd;
-    e.y += (e.jumpTargetY - e.y) * 0.12 * spd;
-    e.x += (Math.random() - 0.5) * 2 * spd;
-    e.y += (Math.random() - 0.5) * 2 * spd;
+    e.x += (e.jumpTargetX - e.x) * 0.06 * spd;
+    e.y += (e.jumpTargetY - e.y) * 0.06 * spd;
+    e.x += (Math.random() - 0.5) * 1 * spd;
+    e.y += (Math.random() - 0.5) * 1 * spd;
   }
 
   _moveFlutter(e, spd) {
