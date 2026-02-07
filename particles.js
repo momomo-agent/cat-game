@@ -7,17 +7,17 @@ class ParticleSystem {
   emit(x, y, colors, count = 20) {
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
-      const speed = 2 + Math.random() * 6;
+      const speed = 3 + Math.random() * 10;
       this.particles.push({
         x, y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         life: 1.0,
-        decay: 0.015 + Math.random() * 0.02,
-        size: 4 + Math.random() * 8,
+        decay: 0.012 + Math.random() * 0.015,
+        size: 6 + Math.random() * 12,
         color: colors[Math.floor(Math.random() * colors.length)],
         rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.2,
+        rotSpeed: (Math.random() - 0.5) * 0.3,
         type: 'square'
       });
     }

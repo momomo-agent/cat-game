@@ -17,6 +17,7 @@ class CatGame {
     this.bgTime = 0;
     this.bgBubbles = [];
     this.bgGrass = [];
+    this.flashAlpha = 0;
     this._loadSettings();
     this._resize();
     this._bindTouch();
@@ -86,14 +87,20 @@ class CatGame {
     entity.captured = true;
     this.score++;
     document.getElementById('scoreDisplay').textContent = '✨ ' + this.score;
-    this.particles.emit(entity.x, entity.y, this.theme.particleColors, 22);
-    this.particles.emitRing(entity.x, entity.y, this.theme.particleColors);
-    this.sound.play(this.theme.captureSound);
+    // BIG explosion - lots of particles
+    const colors = this.theme.particleColors;
+    this.particles.emit(entity.x, entity.y, colors, 40);
+    this.particles.emitRing(entity.x, entity.y, colors, 20);
+    this.particles.emit(entity.x, entity.y, ['#fff', '#fffde7', '#fff9c4'], 15);
+    // Screen flash
+    this.flashAlpha = 0.4;
+    // Sound
+    this.sound.playBig(this.theme.captureSound);
     setTimeout(() => {
       const idx = this.entities.indexOf(entity);
       if (idx !== -1) this.entities.splice(idx, 1);
       if (!this.paused) this._spawnOne();
-    }, 300);
+    }, 400);
   }
 
   _bindSettings() {
@@ -189,19 +196,11 @@ class CatGame {
 
   _spawnOne() {
     const pad = 60, pattern = this.theme.movePattern;
-    let x, y;
-    if (pattern === 'scurry') {
-      const edge = Math.floor(Math.random() * 4);
-      if (edge === 0) { x = -pad; y = Math.random() * this.H; }
-      else if (edge === 1) { x = this.W + pad; y = Math.random() * this.H; }
-      else if (edge === 2) { x = Math.random() * this.W; y = -pad; }
-      else { x = Math.random() * this.W; y = this.H + pad; }
-    } else {
-      x = pad + Math.random() * (this.W - pad * 2);
-      y = pad + Math.random() * (this.H - pad * 2);
-    }
+    // Always spawn inside screen
+    const x = pad + Math.random() * (this.W - pad * 2);
+    const y = pad + Math.random() * (this.H - pad * 2);
     const emoji = this.theme.emojis[Math.floor(Math.random() * this.theme.emojis.length)];
-    const size = pattern === 'laser' ? 32 : 28 + Math.random() * 16;
+    const size = pattern === 'laser' ? 40 : 38 + Math.random() * 18;
     const a = Math.random() * Math.PI * 2;
     const spd = pattern === 'scurry' ? 2 + Math.random() * 2 : 1 + Math.random();
     this.entities.push({
@@ -233,13 +232,12 @@ class CatGame {
       case 'laser': this._moveLaser(e, spd); break;
       case 'flutter': this._moveFlutter(e, spd); break;
     }
-    if (p !== 'laser') {
-      const m = 100;
-      if (e.x < -m) e.x = this.W + m * 0.5;
-      if (e.x > this.W + m) e.x = -m * 0.5;
-      if (e.y < -m) e.y = this.H + m * 0.5;
-      if (e.y > this.H + m) e.y = -m * 0.5;
-    }
+    // Keep ALL entities inside screen (bounce off edges)
+    const margin = e.size * 0.5;
+    if (e.x < margin) { e.x = margin; e.vx = Math.abs(e.vx) + 0.5; e.flipX = true; }
+    if (e.x > this.W - margin) { e.x = this.W - margin; e.vx = -Math.abs(e.vx) - 0.5; e.flipX = false; }
+    if (e.y < margin) { e.y = margin; e.vy = Math.abs(e.vy) + 0.5; }
+    if (e.y > this.H - margin) { e.y = this.H - margin; e.vy = -Math.abs(e.vy) - 0.5; }
   }
 
   _moveSwim(e, spd) {
@@ -354,14 +352,16 @@ class CatGame {
     ctx.save();
     ctx.translate(e.x, e.y);
     if (e.flipX) ctx.scale(-1, 1);
+    // Breathing animation to attract cat attention
+    const breathe = 1 + Math.sin(e.time * 0.08) * 0.08;
+    ctx.scale(breathe, breathe);
     if (this.theme.movePattern === 'laser') {
-      ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 40;
+      ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 50;
       const pulse = 0.85 + Math.sin(e.time * 0.15) * 0.15;
       ctx.scale(pulse, pulse);
-      // Extra glow layer
       ctx.beginPath();
-      ctx.arc(0, 0, e.size * 0.6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,23,68,0.15)';
+      ctx.arc(0, 0, e.size * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,23,68,0.2)';
       ctx.fill();
     }
     ctx.font = e.size + 'px serif';
@@ -379,6 +379,13 @@ class CatGame {
     while (this.entities.filter(e => !e.captured).length < this.targetCount) this._spawnOne();
     this.particles.update();
     this.particles.draw(ctx);
+    // Screen flash on capture
+    if (this.flashAlpha > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,' + this.flashAlpha + ')';
+      ctx.fillRect(0, 0, this.W, this.H);
+      this.flashAlpha *= 0.85;
+      if (this.flashAlpha < 0.01) this.flashAlpha = 0;
+    }
   }
 }
 

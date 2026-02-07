@@ -114,4 +114,34 @@ class SoundManager {
       osc.stop(t + off + 0.25);
     });
   }
+
+  // Big exaggerated capture sound
+  playBig(type) {
+    if (!this.enabled || !this.ctx) return;
+    this.resume();
+    // Play normal sound louder
+    this.play(type);
+    // Plus a satisfying "pop-sparkle" overlay
+    const t = this.ctx.currentTime;
+    // Deep thump
+    const osc1 = this.ctx.createOscillator();
+    const g1 = this.ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(150, t);
+    osc1.frequency.exponentialRampToValueAtTime(40, t + 0.2);
+    g1.gain.setValueAtTime(0.5, t);
+    g1.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+    osc1.connect(g1).connect(this.ctx.destination);
+    osc1.start(t); osc1.stop(t + 0.25);
+    // High sparkle
+    const osc2 = this.ctx.createOscillator();
+    const g2 = this.ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1200, t + 0.05);
+    osc2.frequency.exponentialRampToValueAtTime(2000, t + 0.15);
+    g2.gain.setValueAtTime(0.3, t + 0.05);
+    g2.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+    osc2.connect(g2).connect(this.ctx.destination);
+    osc2.start(t + 0.05); osc2.stop(t + 0.3);
+  }
 }
