@@ -233,6 +233,7 @@ class CatGame {
       case 'crawl': this._moveCrawl(e, spd); break;
       case 'laser': this._moveLaser(e, spd); break;
       case 'flutter': this._moveFlutter(e, spd); break;
+      case 'bounce': this._moveBounce(e, spd); break;
     }
     // Keep ALL entities inside screen (bounce off edges)
     const margin = e.size * 0.5;
@@ -298,6 +299,33 @@ class CatGame {
     const max = 1.2 * spd, len = Math.sqrt(e.vx * e.vx + e.vy * e.vy);
     if (len > max) { e.vx = (e.vx / len) * max; e.vy = (e.vy / len) * max; }
     e.x += e.vx; e.y += e.vy; e.flipX = e.vx > 0;
+  }
+
+  _moveBounce(e, spd) {
+    // Gravity
+    e.vy += 0.15 * spd;
+    e.x += e.vx * spd;
+    e.y += e.vy * spd;
+    // Bounce off floor
+    const floor = this.H - e.size;
+    if (e.y > floor) {
+      e.y = floor;
+      e.vy = -Math.abs(e.vy) * 0.8;
+      if (Math.abs(e.vy) < 1) e.vy = -(4 + Math.random() * 4) * spd;
+      // Random horizontal kick on bounce
+      e.vx += (Math.random() - 0.5) * 3 * spd;
+    }
+    // Bounce off ceiling
+    if (e.y < e.size) {
+      e.y = e.size;
+      e.vy = Math.abs(e.vy) * 0.8;
+    }
+    // Bounce off walls
+    if (e.x < e.size) { e.x = e.size; e.vx = Math.abs(e.vx) * 0.9; }
+    if (e.x > this.W - e.size) { e.x = this.W - e.size; e.vx = -Math.abs(e.vx) * 0.9; }
+    // Air friction
+    e.vx *= 0.998;
+    e.flipX = e.vx > 0;
   }
 
   _initBg() {

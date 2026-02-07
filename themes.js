@@ -49,5 +49,15 @@ const THEMES = {
     movePattern: 'flutter',
     captureSound: 'chime',
     bgType: 'flowers'
+  },
+  ball: {
+    name: '皮球',
+    icon: '⚽',
+    emojis: ['🔵', '🟡', '🟢', '🟠', '🔴', '⚽', '🏀', '🎾'],
+    bgGradient: ['#263238', '#37474f', '#455a64'],
+    particleColors: ['#ffeb3b', '#ff9800', '#4caf50', '#2196f3', '#f44336'],
+    movePattern: 'bounce',
+    captureSound: 'bounce',
+    bgType: 'none'
   }
 };

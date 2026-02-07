@@ -29,6 +29,7 @@ class SoundManager {
       case 'crunch': this._crunch(); break;
       case 'zap': this._zap(); break;
       case 'chime': this._chime(); break;
+      case 'bounce': this._bounce(); break;
       default: this._chime();
     }
   }
@@ -113,6 +114,31 @@ class SoundManager {
       osc.start(t + off);
       osc.stop(t + off + 0.25);
     });
+  }
+
+  _bounce() {
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.2);
+    // Rubber squeak
+    const osc2 = this.ctx.createOscillator();
+    const g2 = this.ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(800, t + 0.02);
+    osc2.frequency.exponentialRampToValueAtTime(400, t + 0.1);
+    g2.gain.setValueAtTime(0.15, t + 0.02);
+    g2.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+    osc2.connect(g2).connect(this.ctx.destination);
+    osc2.start(t + 0.02);
+    osc2.stop(t + 0.12);
   }
 
   // Big exaggerated capture sound
